@@ -1,27 +1,17 @@
+import { SelectExperiment } from '@/components/SelectExperiment';
+import { useWindowRectActions } from '@/store/windowRect';
+import { Experiment } from '@/components/Experiment';
 import { invoke } from '@tauri-apps/api/core';
-import { useEffect, useState } from 'react';
 import { TWindowRect } from '@/types/rect';
-import { getRandom } from './utils';
-
-import './App.css';
-
-const PADDING: number = 10;
+import { useEffect } from 'react';
 
 function App() {
-  const [rect, setRect] = useState<TWindowRect>();
-
-  const setCursorPosition = async () => {
-    if (!rect) return;
-    const x = getRandom(rect.left + PADDING, rect.right - PADDING);
-    const y = getRandom(rect.top + PADDING, rect.bottom - PADDING);
-
-    await invoke<boolean>('set_cursor_pos', { x, y });
-  };
+  const { setWindowRect } = useWindowRectActions();
 
   useEffect(() => {
     const getWindowRect = async () => {
       const rect = await invoke<TWindowRect>('get_window_rect');
-      setRect(rect);
+      setWindowRect(rect);
     };
 
     getWindowRect();
@@ -29,11 +19,8 @@ function App() {
 
   return (
     <main className="container">
-      <p>Left {rect?.left}</p>
-      <p>Top {rect?.top}</p>
-      <p>Right {rect?.right}</p>
-      <p>Bottom {rect?.bottom}</p>
-      <button onClick={setCursorPosition}>Изменить позицию курсора</button>
+      <SelectExperiment />
+      <Experiment />
     </main>
   );
 }
